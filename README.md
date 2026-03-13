@@ -10,6 +10,7 @@ Part of the Phase Nexa ecosystem.
 - **DataFrame-first API**: Build curves from pandas DataFrames
 - **15-minute MTU support**: Handle both hourly and quarter-hourly market time units
 - **EUPHEMIA compatibility**: Output formats compatible with European power market coupling
+- **Comprehensive validation**: EUPHEMIA compliance checks, data quality validation, and temporal constraints
 
 ## Installation
 
@@ -200,6 +201,55 @@ book = update_all_statuses(book, BidStatus.VALIDATED)
 df = orders_to_dataframe(book)
 print(df[["bid_id", "bid_type", "bidding_zone", "status"]])
 ```
+
+### Validating bids for EUPHEMIA compliance
+
+```python
+from nexa_bidkit import (
+    validate_bid,
+    validate_bids,
+    validate_order_book_for_submission,
+    get_validation_summary,
+    EuphemiaValidationError,
+    DataQualityError,
+    TemporalValidationError,
+)
+
+# Validate individual bid
+try:
+    validate_bid(peak_bid)
+    print("Bid is valid!")
+except EuphemiaValidationError as e:
+    print(f"EUPHEMIA compliance error: {e}")
+except DataQualityError as e:
+    print(f"Data quality issue: {e}")
+
+# Batch validation (collects all errors)
+results = validate_bids([must_run, peak_bid, ramp_up])
+summary = get_validation_summary(results)
+
+print(f"Validated {summary['total_bids']} bids")
+print(f"Pass rate: {summary['pass_rate']:.1f}%")
+print(f"Errors by type: {summary['error_types']}")
+
+# Comprehensive validation before submission
+gate_closure = datetime(2026, 3, 31, 12, 0, tzinfo=ZoneInfo("Europe/Oslo"))
+
+try:
+    validate_order_book_for_submission(
+        book,
+        gate_closure_time=gate_closure,
+    )
+    print("Order book ready for submission")
+except ValidationError as e:
+    print(f"Validation failed: {e}")
+```
+
+The validation module enforces:
+- **EUPHEMIA rules**: Maximum curve steps (200), block duration limits (1-24 hours)
+- **Data quality**: Minimum volumes (0.1 MW), reasonable price increments
+- **Temporal constraints**: Gate closure deadlines, delivery periods within auction day
+- **Portfolio limits**: Total volume sanity checks across bidding zones
 
 ## Core Concepts
 

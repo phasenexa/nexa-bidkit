@@ -81,7 +81,6 @@ nexa-bidkit/
     curves.py          # merit order curve construction
     bids.py            # bid objects (hourly, block, linked, exclusive)
     orders.py          # order book / portfolio of bids
-    euphemia.py        # EUPHEMIA-compatible output formats
     validation.py      # bid validation rules
     types.py           # core types/enums (MTU, BiddingZone, etc.)
   tests/

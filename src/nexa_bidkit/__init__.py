@@ -64,6 +64,24 @@ from nexa_bidkit.types import (
     PriceQuantityStep,
     Volume,
 )
+from nexa_bidkit.validation import (
+    DataQualityError,
+    EuphemiaValidationError,
+    PortfolioValidationError,
+    TemporalValidationError,
+    ValidationError,
+    get_validation_summary,
+    validate_bid,
+    validate_bids,
+    validate_block_bid,
+    validate_exclusive_group_bid,
+    validate_gate_closure,
+    validate_linked_block_bid,
+    validate_order_book_bids,
+    validate_order_book_for_submission,
+    validate_price_quantity_curve,
+    validate_simple_bid,
+)
 
 __all__ = [
     # Bid models
@@ -114,6 +132,24 @@ __all__ = [
     "scale_curve",
     "curves_to_dataframe",
     "validate_dataframe_schema",
+    # Validation exceptions
+    "ValidationError",
+    "EuphemiaValidationError",
+    "DataQualityError",
+    "TemporalValidationError",
+    "PortfolioValidationError",
+    # Validation functions
+    "validate_bid",
+    "validate_bids",
+    "validate_simple_bid",
+    "validate_block_bid",
+    "validate_linked_block_bid",
+    "validate_exclusive_group_bid",
+    "validate_price_quantity_curve",
+    "validate_order_book_bids",
+    "validate_order_book_for_submission",
+    "validate_gate_closure",
+    "get_validation_summary",
     # Types
     "BiddingZone",
     "BidStatus",
