@@ -72,3 +72,4 @@ nexa-bidkit/
   - Run tests and ensure they pass
   - Linters (like black or mypy) show no issues
   - Update README and/or docs to document the new behaviour/feature
+  - Add anything needed in @.gitignore to avoid checking in secrets, or temp files/logs
