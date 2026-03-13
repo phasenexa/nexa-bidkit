@@ -44,6 +44,34 @@ Quants, data scientists, and developers at energy trading companies who build th
 - Do not create naive datetimes. Always use timezone-aware.
 - Do not add unnecessary dependencies.
 
+## Workflow (Trunk-Based Development)
+- **NEVER push directly to main**. The main branch is protected.
+- **Always work on feature branches**: Create a short-lived feature branch for each task (e.g. `feat/add-curves-module`, `fix/mtu-validation`)
+- **Create pull requests**: When work is complete, create a PR to merge into main
+- **Branch naming conventions**:
+  - `feat/description` for new features
+  - `fix/description` for bug fixes
+  - `refactor/description` for refactoring
+  - `docs/description` for documentation updates
+  - `test/description` for test improvements
+- **Before creating a PR**:
+  - Run `make test` to ensure all tests pass
+  - Run type checking: `poetry run mypy src`
+  - Run linting: `poetry run ruff check src tests`
+  - Ensure Definition of Done criteria are met
+  - Write clear, descriptive commit messages
+- **PR requirements**:
+  - Title should clearly describe the change
+  - Description should explain why the change is needed
+  - All tests must pass
+  - Code coverage should meet or exceed 80%
+  - At least 1 approving review required (when branch protection is enabled)
+- **Commit workflow**:
+  - Make focused, atomic commits
+  - Each commit should represent a logical unit of work
+  - Run tests before committing
+  - Use conventional commit messages when appropriate
+
 ## Code layout
 
 ```

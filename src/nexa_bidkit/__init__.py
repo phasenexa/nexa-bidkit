@@ -1,5 +1,19 @@
 """nexa-bidkit: day-ahead and intraday auction bid generation for European power markets."""
 
+from nexa_bidkit.bids import (
+    BlockBid,
+    ExclusiveGroupBid,
+    LinkedBlockBid,
+    SimpleBid,
+    block_bid,
+    exclusive_group,
+    generate_bid_id,
+    indivisible_block_bid,
+    linked_block_bid,
+    simple_bid_from_curve,
+    validate_bid_collection,
+    with_status,
+)
 from nexa_bidkit.curves import (
     aggregate_by_price,
     clip_curve,
@@ -32,6 +46,20 @@ from nexa_bidkit.types import (
 )
 
 __all__ = [
+    # Bid models
+    "SimpleBid",
+    "BlockBid",
+    "LinkedBlockBid",
+    "ExclusiveGroupBid",
+    # Bid construction helpers
+    "generate_bid_id",
+    "simple_bid_from_curve",
+    "block_bid",
+    "indivisible_block_bid",
+    "linked_block_bid",
+    "exclusive_group",
+    "with_status",
+    "validate_bid_collection",
     # Curve construction and manipulation
     "aggregate_by_price",
     "clip_curve",

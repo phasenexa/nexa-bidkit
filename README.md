@@ -81,6 +81,81 @@ curve = clip_curve(
 curve = aggregate_by_price(curve)  # Consolidate for smaller message size
 ```
 
+### Creating bids
+
+```python
+from decimal import Decimal
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from nexa_bidkit import (
+    BiddingZone,
+    Direction,
+    DeliveryPeriod,
+    MTUDuration,
+    block_bid,
+    indivisible_block_bid,
+    linked_block_bid,
+    exclusive_group,
+)
+
+# Define a delivery period (4 hours of quarter-hourly MTUs)
+delivery = DeliveryPeriod(
+    start=datetime(2026, 4, 1, 10, 0, tzinfo=ZoneInfo("Europe/Oslo")),
+    end=datetime(2026, 4, 1, 14, 0, tzinfo=ZoneInfo("Europe/Oslo")),
+    duration=MTUDuration.QUARTER_HOURLY,
+)
+
+# Create a block bid (partially fillable)
+peak_bid = block_bid(
+    bidding_zone=BiddingZone.NO1,
+    direction=Direction.SELL,
+    delivery_period=delivery,
+    price=Decimal("55.0"),
+    volume=Decimal("100"),
+    min_acceptance_ratio=Decimal("0.5"),  # Accept 50%+ fill
+)
+
+# Create an indivisible block bid (all-or-nothing)
+must_run = indivisible_block_bid(
+    bidding_zone=BiddingZone.NO1,
+    direction=Direction.SELL,
+    delivery_period=delivery,
+    price=Decimal("25.0"),
+    volume=Decimal("50"),
+)
+
+# Create a linked block bid (only accepted if parent accepted)
+ramp_up = linked_block_bid(
+    parent_bid_id=must_run.bid_id,
+    bidding_zone=BiddingZone.NO1,
+    direction=Direction.SELL,
+    delivery_period=delivery,
+    price=Decimal("35.0"),
+    volume=Decimal("25"),
+)
+
+# Create an exclusive group (at most one accepted)
+option_a = block_bid(
+    bidding_zone=BiddingZone.NO1,
+    direction=Direction.SELL,
+    delivery_period=delivery,
+    price=Decimal("40.0"),
+    volume=Decimal("150"),
+)
+option_b = block_bid(
+    bidding_zone=BiddingZone.NO1,
+    direction=Direction.SELL,
+    delivery_period=delivery,
+    price=Decimal("45.0"),
+    volume=Decimal("120"),
+)
+options = exclusive_group([option_a, option_b])
+
+print(f"Peak bid total volume: {peak_bid.total_volume} MW")
+print(f"Must-run is indivisible: {must_run.is_indivisible}")
+print(f"Exclusive group has {options.member_count} options")
+```
+
 ## Core Concepts
 
 ### Market Time Units (MTU)
