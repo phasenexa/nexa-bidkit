@@ -194,9 +194,7 @@ def test_empty_curve(sample_mtu):
 
 def test_constant_curve(sample_mtu):
     """Create curve with single step."""
-    curve = constant_curve(
-        Decimal("50"), Decimal("100"), CurveType.SUPPLY, sample_mtu
-    )
+    curve = constant_curve(Decimal("50"), Decimal("100"), CurveType.SUPPLY, sample_mtu)
 
     assert len(curve.steps) == 1
     assert curve.steps[0].price == Decimal("50")
@@ -549,8 +547,7 @@ def test_merge_total_volume_property(num_curves, volumes):
 
     for _i in range(num_curves):
         steps_data = [
-            {"price": j * 10, "volume": volumes[j % len(volumes)]}
-            for j in range(len(volumes))
+            {"price": j * 10, "volume": volumes[j % len(volumes)]} for j in range(len(volumes))
         ]
         curve = from_dict_list(steps_data, CurveType.SUPPLY, mtu)
         curves.append(curve)

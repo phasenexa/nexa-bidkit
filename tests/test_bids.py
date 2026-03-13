@@ -128,9 +128,7 @@ def sample_block_bid(sample_delivery_period: DeliveryPeriod) -> BlockBid:
 class TestSimpleBid:
     """Tests for SimpleBid model."""
 
-    def test_valid_supply_bid(
-        self, sample_supply_curve: PriceQuantityCurve
-    ) -> None:
+    def test_valid_supply_bid(self, sample_supply_curve: PriceQuantityCurve) -> None:
         """Valid SimpleBid with supply curve."""
         bid = SimpleBid(
             bid_id="test-bid-1",
@@ -144,9 +142,7 @@ class TestSimpleBid:
         assert bid.status == BidStatus.DRAFT
         assert bid.bid_type == BidType.SIMPLE_HOURLY
 
-    def test_valid_demand_bid(
-        self, sample_demand_curve: PriceQuantityCurve
-    ) -> None:
+    def test_valid_demand_bid(self, sample_demand_curve: PriceQuantityCurve) -> None:
         """Valid SimpleBid with demand curve."""
         bid = SimpleBid(
             bid_id="test-bid-2",
@@ -161,9 +157,7 @@ class TestSimpleBid:
         self, sample_supply_curve: PriceQuantityCurve
     ) -> None:
         """Reject SimpleBid where direction doesn't match curve type."""
-        with pytest.raises(
-            ValidationError, match="Direction BUY requires curve type DEMAND"
-        ):
+        with pytest.raises(ValidationError, match="Direction BUY requires curve type DEMAND"):
             SimpleBid(
                 bid_id="bad-bid",
                 bidding_zone=BiddingZone.NO1,
@@ -171,9 +165,7 @@ class TestSimpleBid:
                 curve=sample_supply_curve,
             )
 
-    def test_empty_bid_id_rejected(
-        self, sample_supply_curve: PriceQuantityCurve
-    ) -> None:
+    def test_empty_bid_id_rejected(self, sample_supply_curve: PriceQuantityCurve) -> None:
         """Reject SimpleBid with empty bid_id."""
         with pytest.raises(ValidationError, match="non-empty string"):
             SimpleBid(
@@ -183,9 +175,7 @@ class TestSimpleBid:
                 curve=sample_supply_curve,
             )
 
-    def test_whitespace_bid_id_rejected(
-        self, sample_supply_curve: PriceQuantityCurve
-    ) -> None:
+    def test_whitespace_bid_id_rejected(self, sample_supply_curve: PriceQuantityCurve) -> None:
         """Reject SimpleBid with whitespace-only bid_id."""
         with pytest.raises(ValidationError, match="non-empty string"):
             SimpleBid(
@@ -195,9 +185,7 @@ class TestSimpleBid:
                 curve=sample_supply_curve,
             )
 
-    def test_metadata_optional(
-        self, sample_supply_curve: PriceQuantityCurve
-    ) -> None:
+    def test_metadata_optional(self, sample_supply_curve: PriceQuantityCurve) -> None:
         """Metadata is optional and defaults to empty dict."""
         bid = SimpleBid(
             bid_id="test-bid",
@@ -207,9 +195,7 @@ class TestSimpleBid:
         )
         assert bid.metadata == {}
 
-    def test_custom_metadata(
-        self, sample_supply_curve: PriceQuantityCurve
-    ) -> None:
+    def test_custom_metadata(self, sample_supply_curve: PriceQuantityCurve) -> None:
         """Custom metadata can be provided."""
         metadata = {"plant_id": "PLANT-001", "trader": "alice"}
         bid = SimpleBid(
@@ -259,9 +245,7 @@ class TestBlockBid:
         assert bid.status == BidStatus.DRAFT
         assert bid.bid_type == BidType.BLOCK
 
-    def test_total_volume_property(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_total_volume_property(self, sample_delivery_period: DeliveryPeriod) -> None:
         """total_volume property calculation."""
         # 4-hour period with 15-min MTUs = 16 MTUs
         bid = BlockBid(
@@ -275,9 +259,7 @@ class TestBlockBid:
         assert sample_delivery_period.mtu_count == 16
         assert bid.total_volume == Decimal("1600")  # 100 MW * 16 MTUs
 
-    def test_is_indivisible_true(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_is_indivisible_true(self, sample_delivery_period: DeliveryPeriod) -> None:
         """is_indivisible property when min_acceptance_ratio=1.0."""
         bid = BlockBid(
             bid_id="block-1",
@@ -290,9 +272,7 @@ class TestBlockBid:
         )
         assert bid.is_indivisible is True
 
-    def test_is_indivisible_false(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_is_indivisible_false(self, sample_delivery_period: DeliveryPeriod) -> None:
         """is_indivisible property when min_acceptance_ratio<1.0."""
         bid = BlockBid(
             bid_id="block-1",
@@ -350,9 +330,7 @@ class TestBlockBid:
         )
         assert bid.min_acceptance_ratio == Decimal("0.0")
 
-    def test_empty_bid_id_rejected(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_empty_bid_id_rejected(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Reject BlockBid with empty bid_id."""
         with pytest.raises(ValidationError, match="non-empty string"):
             BlockBid(
@@ -373,9 +351,7 @@ class TestBlockBid:
 class TestLinkedBlockBid:
     """Tests for LinkedBlockBid model."""
 
-    def test_valid_linked_block_bid(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_valid_linked_block_bid(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Valid LinkedBlockBid construction."""
         bid = LinkedBlockBid(
             bid_id="linked-1",
@@ -391,13 +367,9 @@ class TestLinkedBlockBid:
         assert bid.parent_bid_id == "parent-block-1"
         assert bid.bid_type == BidType.LINKED_BLOCK
 
-    def test_self_reference_rejected(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_self_reference_rejected(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Reject LinkedBlockBid that references itself as parent."""
-        with pytest.raises(
-            ValidationError, match="cannot reference itself as parent"
-        ):
+        with pytest.raises(ValidationError, match="cannot reference itself as parent"):
             LinkedBlockBid(
                 bid_id="self-ref",
                 bidding_zone=BiddingZone.NO1,
@@ -408,9 +380,7 @@ class TestLinkedBlockBid:
                 parent_bid_id="self-ref",  # Same as bid_id
             )
 
-    def test_total_volume_property(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_total_volume_property(self, sample_delivery_period: DeliveryPeriod) -> None:
         """total_volume property calculation."""
         bid = LinkedBlockBid(
             bid_id="linked-1",
@@ -423,9 +393,7 @@ class TestLinkedBlockBid:
         )
         assert bid.total_volume == Decimal("800")  # 50 MW * 16 MTUs
 
-    def test_is_indivisible_property(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_is_indivisible_property(self, sample_delivery_period: DeliveryPeriod) -> None:
         """is_indivisible property."""
         bid = LinkedBlockBid(
             bid_id="linked-1",
@@ -439,9 +407,7 @@ class TestLinkedBlockBid:
         )
         assert bid.is_indivisible is False
 
-    def test_empty_parent_id_rejected(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_empty_parent_id_rejected(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Reject LinkedBlockBid with empty parent_bid_id."""
         with pytest.raises(ValidationError, match="non-empty strings"):
             LinkedBlockBid(
@@ -463,9 +429,7 @@ class TestLinkedBlockBid:
 class TestExclusiveGroupBid:
     """Tests for ExclusiveGroupBid model."""
 
-    def test_valid_exclusive_group(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_valid_exclusive_group(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Valid ExclusiveGroupBid with 2 blocks."""
         block1 = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -494,9 +458,7 @@ class TestExclusiveGroupBid:
         assert group.all_bid_ids == ["block-a", "block-b"]
         assert group.bid_type == BidType.EXCLUSIVE_GROUP
 
-    def test_single_block_rejected(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_single_block_rejected(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Reject ExclusiveGroupBid with only 1 block."""
         block1 = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -513,9 +475,7 @@ class TestExclusiveGroupBid:
                 block_bids=[block1],
             )
 
-    def test_mixed_bidding_zones_rejected(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_mixed_bidding_zones_rejected(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Reject ExclusiveGroupBid with mixed bidding zones."""
         block1 = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -539,9 +499,7 @@ class TestExclusiveGroupBid:
                 block_bids=[block1, block2],
             )
 
-    def test_mixed_directions_rejected(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_mixed_directions_rejected(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Reject ExclusiveGroupBid with mixed directions."""
         block1 = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -565,9 +523,7 @@ class TestExclusiveGroupBid:
                 block_bids=[block1, block2],
             )
 
-    def test_duplicate_bid_ids_rejected(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_duplicate_bid_ids_rejected(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Reject ExclusiveGroupBid with duplicate bid_ids."""
         block1 = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -593,9 +549,7 @@ class TestExclusiveGroupBid:
                 block_bids=[block1, block2],
             )
 
-    def test_empty_group_id_rejected(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_empty_group_id_rejected(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Reject ExclusiveGroupBid with empty group_id."""
         block1 = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -664,37 +618,27 @@ class TestSimpleBidFromCurve:
         assert bid.direction == Direction.BUY
         assert bid.bidding_zone == BiddingZone.DE_LU
 
-    def test_auto_generates_bid_id(
-        self, sample_supply_curve: PriceQuantityCurve
-    ) -> None:
+    def test_auto_generates_bid_id(self, sample_supply_curve: PriceQuantityCurve) -> None:
         """Auto-generates bid_id if not provided."""
         bid = simple_bid_from_curve(sample_supply_curve, BiddingZone.NO1)
         assert bid.bid_id.startswith("simple_")
 
     def test_custom_bid_id(self, sample_supply_curve: PriceQuantityCurve) -> None:
         """Custom bid_id can be provided."""
-        bid = simple_bid_from_curve(
-            sample_supply_curve, BiddingZone.NO1, bid_id="my-custom-id"
-        )
+        bid = simple_bid_from_curve(sample_supply_curve, BiddingZone.NO1, bid_id="my-custom-id")
         assert bid.bid_id == "my-custom-id"
 
-    def test_custom_metadata(
-        self, sample_supply_curve: PriceQuantityCurve
-    ) -> None:
+    def test_custom_metadata(self, sample_supply_curve: PriceQuantityCurve) -> None:
         """Custom metadata can be provided."""
         metadata = {"plant": "PLANT-001"}
-        bid = simple_bid_from_curve(
-            sample_supply_curve, BiddingZone.NO1, metadata=metadata
-        )
+        bid = simple_bid_from_curve(sample_supply_curve, BiddingZone.NO1, metadata=metadata)
         assert bid.metadata == metadata
 
 
 class TestBlockBidHelper:
     """Tests for block_bid helper function."""
 
-    def test_creates_valid_block_bid(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_creates_valid_block_bid(self, sample_delivery_period: DeliveryPeriod) -> None:
         """block_bid creates a valid BlockBid."""
         bid = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -707,9 +651,7 @@ class TestBlockBidHelper:
         assert bid.price == Decimal("55.0")
         assert bid.volume == Decimal("100")
 
-    def test_auto_generates_bid_id(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_auto_generates_bid_id(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Auto-generates bid_id if not provided."""
         bid = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -720,9 +662,7 @@ class TestBlockBidHelper:
         )
         assert bid.bid_id.startswith("block_")
 
-    def test_default_min_acceptance_ratio(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_default_min_acceptance_ratio(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Default min_acceptance_ratio is 1.0."""
         bid = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -737,9 +677,7 @@ class TestBlockBidHelper:
 class TestIndivisibleBlockBid:
     """Tests for indivisible_block_bid helper."""
 
-    def test_creates_indivisible_block(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_creates_indivisible_block(self, sample_delivery_period: DeliveryPeriod) -> None:
         """indivisible_block_bid creates block with min_acceptance_ratio=1.0."""
         bid = indivisible_block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -755,9 +693,7 @@ class TestIndivisibleBlockBid:
 class TestLinkedBlockBidHelper:
     """Tests for linked_block_bid helper."""
 
-    def test_creates_valid_linked_bid(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_creates_valid_linked_bid(self, sample_delivery_period: DeliveryPeriod) -> None:
         """linked_block_bid creates a valid LinkedBlockBid."""
         bid = linked_block_bid(
             parent_bid_id="parent-123",
@@ -770,9 +706,7 @@ class TestLinkedBlockBidHelper:
         assert isinstance(bid, LinkedBlockBid)
         assert bid.parent_bid_id == "parent-123"
 
-    def test_auto_generates_bid_id(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_auto_generates_bid_id(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Auto-generates bid_id if not provided."""
         bid = linked_block_bid(
             parent_bid_id="parent-123",
@@ -788,9 +722,7 @@ class TestLinkedBlockBidHelper:
 class TestExclusiveGroup:
     """Tests for exclusive_group helper."""
 
-    def test_creates_valid_group(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_creates_valid_group(self, sample_delivery_period: DeliveryPeriod) -> None:
         """exclusive_group creates a valid ExclusiveGroupBid."""
         block1 = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -811,9 +743,7 @@ class TestExclusiveGroup:
         assert group.bidding_zone == BiddingZone.NO1
         assert group.direction == Direction.SELL
 
-    def test_derives_zone_from_first_block(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_derives_zone_from_first_block(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Bidding zone is derived from first block."""
         block1 = block_bid(
             bidding_zone=BiddingZone.SE1,
@@ -833,9 +763,7 @@ class TestExclusiveGroup:
         assert group.bidding_zone == BiddingZone.SE1
         assert group.direction == Direction.BUY
 
-    def test_auto_generates_group_id(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_auto_generates_group_id(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Auto-generates group_id if not provided."""
         block1 = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -854,9 +782,7 @@ class TestExclusiveGroup:
         group = exclusive_group([block1, block2])
         assert group.group_id.startswith("group_")
 
-    def test_rejects_single_block(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_rejects_single_block(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Reject exclusive_group with fewer than 2 blocks."""
         block1 = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -872,9 +798,7 @@ class TestExclusiveGroup:
 class TestWithStatus:
     """Tests for with_status helper."""
 
-    def test_updates_simple_bid_status(
-        self, sample_supply_curve: PriceQuantityCurve
-    ) -> None:
+    def test_updates_simple_bid_status(self, sample_supply_curve: PriceQuantityCurve) -> None:
         """with_status creates new SimpleBid with updated status."""
         original = SimpleBid(
             bid_id="test-bid",
@@ -889,9 +813,7 @@ class TestWithStatus:
         # Original is unchanged
         assert original.status == BidStatus.DRAFT
 
-    def test_updates_block_bid_status(
-        self, sample_block_bid: BlockBid
-    ) -> None:
+    def test_updates_block_bid_status(self, sample_block_bid: BlockBid) -> None:
         """with_status creates new BlockBid with updated status."""
         updated = with_status(sample_block_bid, BidStatus.SUBMITTED)
         assert updated.status == BidStatus.SUBMITTED
@@ -924,9 +846,7 @@ class TestValidateBidCollection:
         # Should not raise
         validate_bid_collection([simple, block])
 
-    def test_duplicate_bid_ids_rejected(
-        self, sample_supply_curve: PriceQuantityCurve
-    ) -> None:
+    def test_duplicate_bid_ids_rejected(self, sample_supply_curve: PriceQuantityCurve) -> None:
         """Reject collection with duplicate bid_ids."""
         bid1 = SimpleBid(
             bid_id="duplicate",
@@ -943,9 +863,7 @@ class TestValidateBidCollection:
         with pytest.raises(ValueError, match="Duplicate bid_ids"):
             validate_bid_collection([bid1, bid2])
 
-    def test_missing_parent_rejected(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_missing_parent_rejected(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Reject collection with linked bid referencing missing parent."""
         linked = linked_block_bid(
             parent_bid_id="non-existent-parent",
@@ -959,9 +877,7 @@ class TestValidateBidCollection:
         with pytest.raises(ValueError, match="non-existent parent"):
             validate_bid_collection([linked])
 
-    def test_valid_parent_reference(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_valid_parent_reference(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Valid parent reference passes validation."""
         parent = block_bid(
             bidding_zone=BiddingZone.NO1,
@@ -983,9 +899,7 @@ class TestValidateBidCollection:
         # Should not raise
         validate_bid_collection([parent, linked])
 
-    def test_circular_dependency_rejected(
-        self, sample_delivery_period: DeliveryPeriod
-    ) -> None:
+    def test_circular_dependency_rejected(self, sample_delivery_period: DeliveryPeriod) -> None:
         """Reject collection with circular dependencies.
 
         Note: This is a degenerate case since LinkedBlockBid prevents

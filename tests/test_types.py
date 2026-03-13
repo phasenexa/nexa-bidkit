@@ -143,9 +143,18 @@ class TestMTUInterval:
 class TestBiddingZone:
     def test_nordic_zones_present(self) -> None:
         zones = [
-            "NO1", "NO2", "NO3", "NO4", "NO5",
-            "SE1", "SE2", "SE3", "SE4",
-            "FI", "DK1", "DK2",
+            "NO1",
+            "NO2",
+            "NO3",
+            "NO4",
+            "NO5",
+            "SE1",
+            "SE2",
+            "SE3",
+            "SE4",
+            "FI",
+            "DK1",
+            "DK2",
         ]
         for zone in zones:
             assert BiddingZone(zone).value == zone

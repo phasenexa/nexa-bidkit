@@ -130,9 +130,7 @@ class BlockBid(BaseModel):
     def validate_min_acceptance_ratio(cls, v: Decimal) -> Decimal:
         """Ensure min_acceptance_ratio is between 0.0 and 1.0."""
         if v < Decimal("0.0") or v > Decimal("1.0"):
-            raise ValueError(
-                f"min_acceptance_ratio must be between 0.0 and 1.0, got {v}"
-            )
+            raise ValueError(f"min_acceptance_ratio must be between 0.0 and 1.0, got {v}")
         return v
 
     @property
@@ -198,9 +196,7 @@ class LinkedBlockBid(BaseModel):
     def validate_min_acceptance_ratio(cls, v: Decimal) -> Decimal:
         """Ensure min_acceptance_ratio is between 0.0 and 1.0."""
         if v < Decimal("0.0") or v > Decimal("1.0"):
-            raise ValueError(
-                f"min_acceptance_ratio must be between 0.0 and 1.0, got {v}"
-            )
+            raise ValueError(f"min_acceptance_ratio must be between 0.0 and 1.0, got {v}")
         return v
 
     @model_validator(mode="after")
@@ -266,9 +262,7 @@ class ExclusiveGroupBid(BaseModel):
     def validate_minimum_blocks(cls, v: list[BlockBid]) -> list[BlockBid]:
         """Ensure at least 2 block bids are provided."""
         if len(v) < 2:
-            raise ValueError(
-                f"ExclusiveGroupBid requires at least 2 block bids, got {len(v)}"
-            )
+            raise ValueError(f"ExclusiveGroupBid requires at least 2 block bids, got {len(v)}")
         return v
 
     @model_validator(mode="after")
@@ -277,9 +271,7 @@ class ExclusiveGroupBid(BaseModel):
         # Check all blocks share same bidding zone
         zones = {block.bidding_zone for block in self.block_bids}
         if len(zones) > 1:
-            raise ValueError(
-                f"All block bids must have the same bidding zone, got {zones}"
-            )
+            raise ValueError(f"All block bids must have the same bidding zone, got {zones}")
         if zones and zones.pop() != self.bidding_zone:
             raise ValueError(
                 f"Block bids zone {zones} does not match group zone {self.bidding_zone}"
@@ -288,9 +280,7 @@ class ExclusiveGroupBid(BaseModel):
         # Check all blocks share same direction
         directions = {block.direction for block in self.block_bids}
         if len(directions) > 1:
-            raise ValueError(
-                f"All block bids must have the same direction, got {directions}"
-            )
+            raise ValueError(f"All block bids must have the same direction, got {directions}")
         if directions and directions.pop() != self.direction:
             raise ValueError(
                 f"Block bids direction does not match group direction {self.direction}"
@@ -303,11 +293,7 @@ class ExclusiveGroupBid(BaseModel):
             raise ValueError(f"Duplicate bid_ids found in group: {duplicates}")
 
         # Check all blocks are pure BlockBid (bid_type == BLOCK)
-        non_block = [
-            block.bid_id
-            for block in self.block_bids
-            if block.bid_type != BidType.BLOCK
-        ]
+        non_block = [block.bid_id for block in self.block_bids if block.bid_type != BidType.BLOCK]
         if non_block:
             raise ValueError(
                 f"ExclusiveGroupBid can only contain pure BlockBid instances, "
@@ -509,9 +495,7 @@ def exclusive_group(
         ValueError: If fewer than 2 block_bids provided.
     """
     if len(block_bids) < 2:
-        raise ValueError(
-            f"exclusive_group requires at least 2 block bids, got {len(block_bids)}"
-        )
+        raise ValueError(f"exclusive_group requires at least 2 block bids, got {len(block_bids)}")
 
     first_block = block_bids[0]
     return ExclusiveGroupBid(
@@ -596,12 +580,8 @@ def validate_bid_collection(
 
     visited: set[str] = set()
     for linked_bid in linked_bids:
-        if linked_bid.bid_id not in visited and has_cycle(
-            linked_bid.bid_id, visited, set()
-        ):
-            raise ValueError(
-                f"Circular dependency detected involving bid {linked_bid.bid_id}"
-            )
+        if linked_bid.bid_id not in visited and has_cycle(linked_bid.bid_id, visited, set()):
+            raise ValueError(f"Circular dependency detected involving bid {linked_bid.bid_id}")
 
 
 __all__ = [

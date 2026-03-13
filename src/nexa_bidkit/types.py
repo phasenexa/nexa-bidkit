@@ -351,8 +351,7 @@ class DeliveryPeriod(BaseModel):
         mtu_seconds = int(mtu_td.total_seconds())
         if total_seconds % mtu_seconds != 0:
             raise ValueError(
-                f"DeliveryPeriod span {span} is not a whole number of "
-                f"{self.duration.value} MTUs"
+                f"DeliveryPeriod span {span} is not a whole number of {self.duration.value} MTUs"
             )
         return self
 
