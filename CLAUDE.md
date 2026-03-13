@@ -98,6 +98,7 @@ nexa-bidkit/
 
   - Update tests to include new/changed work, aim for >80% code coverage, but prioritise good tests
   - Run tests and ensure they pass
+  - Run the ruff formatter to reformat code
   - Linters (like black or mypy) show no issues
   - Update README and/or docs to document the new behaviour/feature
   - Add anything needed in @.gitignore to avoid checking in secrets, or temp files/logs

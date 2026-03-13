@@ -1,6 +1,6 @@
 """Tests for nexa_bidkit.types — core domain types."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 from decimal import Decimal
 
 import pytest
@@ -23,7 +23,7 @@ from nexa_bidkit.types import (
 # Helpers
 # ---------------------------------------------------------------------------
 
-UTC = timezone.utc
+UTC = UTC
 CET = timezone(timedelta(hours=1), "CET")
 
 # A fixed aware datetime to anchor tests
@@ -142,7 +142,21 @@ class TestMTUInterval:
 
 class TestBiddingZone:
     def test_nordic_zones_present(self) -> None:
-        for zone in ["NO1", "NO2", "NO3", "NO4", "NO5", "SE1", "SE2", "SE3", "SE4", "FI", "DK1", "DK2"]:
+        zones = [
+            "NO1",
+            "NO2",
+            "NO3",
+            "NO4",
+            "NO5",
+            "SE1",
+            "SE2",
+            "SE3",
+            "SE4",
+            "FI",
+            "DK1",
+            "DK2",
+        ]
+        for zone in zones:
             assert BiddingZone(zone).value == zone
 
     def test_cwe_zones_present(self) -> None:
@@ -270,7 +284,9 @@ class TestPriceQuantityCurve:
 
 class TestDeliveryPeriod:
     def test_single_quarter_mtu(self) -> None:
-        dp = DeliveryPeriod(start=T0, end=T0 + timedelta(minutes=15), duration=MTUDuration.QUARTER_HOURLY)
+        dp = DeliveryPeriod(
+            start=T0, end=T0 + timedelta(minutes=15), duration=MTUDuration.QUARTER_HOURLY
+        )
         assert dp.mtu_count == 1
 
     def test_full_day_hourly(self) -> None:
@@ -278,11 +294,15 @@ class TestDeliveryPeriod:
         assert dp.mtu_count == 24
 
     def test_full_day_quarter_hourly(self) -> None:
-        dp = DeliveryPeriod(start=T0, end=T0 + timedelta(hours=24), duration=MTUDuration.QUARTER_HOURLY)
+        dp = DeliveryPeriod(
+            start=T0, end=T0 + timedelta(hours=24), duration=MTUDuration.QUARTER_HOURLY
+        )
         assert dp.mtu_count == 96
 
     def test_mtu_intervals_count(self) -> None:
-        dp = DeliveryPeriod(start=T0, end=T0 + timedelta(hours=4), duration=MTUDuration.QUARTER_HOURLY)
+        dp = DeliveryPeriod(
+            start=T0, end=T0 + timedelta(hours=4), duration=MTUDuration.QUARTER_HOURLY
+        )
         intervals = dp.mtu_intervals()
         assert len(intervals) == 16
 

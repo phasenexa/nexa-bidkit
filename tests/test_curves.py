@@ -29,9 +29,7 @@ from nexa_bidkit.types import (
     CurveType,
     MTUDuration,
     MTUInterval,
-    PriceQuantityStep,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -196,9 +194,7 @@ def test_empty_curve(sample_mtu):
 
 def test_constant_curve(sample_mtu):
     """Create curve with single step."""
-    curve = constant_curve(
-        Decimal("50"), Decimal("100"), CurveType.SUPPLY, sample_mtu
-    )
+    curve = constant_curve(Decimal("50"), Decimal("100"), CurveType.SUPPLY, sample_mtu)
 
     assert len(curve.steps) == 1
     assert curve.steps[0].price == Decimal("50")
@@ -488,7 +484,7 @@ def test_roundtrip_dataframe(sample_mtu):
 
     assert len(reconstructed.steps) == len(original.steps)
     assert reconstructed.total_volume == original.total_volume
-    for orig_step, recon_step in zip(original.steps, reconstructed.steps):
+    for orig_step, recon_step in zip(original.steps, reconstructed.steps, strict=False):
         assert orig_step.price == recon_step.price
         assert orig_step.volume == recon_step.volume
 
@@ -549,8 +545,10 @@ def test_merge_total_volume_property(num_curves, volumes):
     curves = []
     expected_total = Decimal("0")
 
-    for i in range(num_curves):
-        steps_data = [{"price": j * 10, "volume": volumes[j % len(volumes)]} for j in range(len(volumes))]
+    for _i in range(num_curves):
+        steps_data = [
+            {"price": j * 10, "volume": volumes[j % len(volumes)]} for j in range(len(volumes))
+        ]
         curve = from_dict_list(steps_data, CurveType.SUPPLY, mtu)
         curves.append(curve)
         expected_total += curve.total_volume

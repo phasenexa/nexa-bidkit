@@ -46,9 +46,7 @@ def _to_decimal(value: Any) -> Decimal:
     raise ValueError(f"Cannot convert {type(value)} to Decimal")
 
 
-def _sort_steps(
-    steps: list[PriceQuantityStep], curve_type: CurveType
-) -> list[PriceQuantityStep]:
+def _sort_steps(steps: list[PriceQuantityStep], curve_type: CurveType) -> list[PriceQuantityStep]:
     """Sort steps according to curve type convention.
 
     Args:
@@ -251,9 +249,7 @@ def from_series_pair(
 
     steps = []
     for price, volume in zip(prices, volumes, strict=False):
-        steps.append(
-            PriceQuantityStep(price=_to_decimal(price), volume=_to_decimal(volume))
-        )
+        steps.append(PriceQuantityStep(price=_to_decimal(price), volume=_to_decimal(volume)))
 
     # Sort steps according to curve type
     steps = _sort_steps(steps, curve_type)
@@ -338,9 +334,7 @@ def scale_curve(curve: PriceQuantityCurve, factor: Decimal) -> PriceQuantityCurv
     if factor < 0:
         raise ValueError("Scaling factor must be non-negative")
 
-    scaled_steps = [
-        PriceQuantityStep(price=s.price, volume=s.volume * factor) for s in curve.steps
-    ]
+    scaled_steps = [PriceQuantityStep(price=s.price, volume=s.volume * factor) for s in curve.steps]
     return PriceQuantityCurve(
         curve_type=curve.curve_type,
         steps=scaled_steps,
@@ -386,9 +380,7 @@ def clip_curve(
                 cumulative += step.volume
             else:
                 # Partial step
-                truncated_steps.append(
-                    PriceQuantityStep(price=step.price, volume=remaining)
-                )
+                truncated_steps.append(PriceQuantityStep(price=step.price, volume=remaining))
                 break
         steps = truncated_steps
 
@@ -418,8 +410,7 @@ def aggregate_by_price(curve: PriceQuantityCurve) -> PriceQuantityCurve:
 
     # Create new steps
     steps = [
-        PriceQuantityStep(price=price, volume=volume)
-        for price, volume in price_volumes.items()
+        PriceQuantityStep(price=price, volume=volume) for price, volume in price_volumes.items()
     ]
 
     # Sort according to curve type
@@ -468,10 +459,7 @@ def merge_curves(
                 f"{first.curve_type} vs {curve.curve_type}"
             )
         if curve.mtu != first.mtu:
-            raise ValueError(
-                f"Cannot merge curves with different MTUs: "
-                f"{first.mtu} vs {curve.mtu}"
-            )
+            raise ValueError(f"Cannot merge curves with different MTUs: {first.mtu} vs {curve.mtu}")
 
     # Collect all steps
     all_steps = []
@@ -557,9 +545,7 @@ def get_curve_summary(curve: PriceQuantityCurve) -> dict[str, Any]:
 
     # Calculate volume-weighted average price
     if curve.steps and curve.total_volume > 0:
-        weighted_sum = sum(
-            s.price * s.volume for s in curve.steps
-        )
+        weighted_sum = sum(s.price * s.volume for s in curve.steps)
         summary["avg_price"] = weighted_sum / curve.total_volume
     else:
         summary["avg_price"] = None
