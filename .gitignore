@@ -44,6 +44,8 @@ coverage.xml
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb
+# Allow example notebooks to be committed
+!examples/*.ipynb
 
 # macOS
 .DS_Store

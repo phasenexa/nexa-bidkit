@@ -1,4 +1,4 @@
-.PHONY: test lint typecheck ci
+.PHONY: test lint typecheck test-notebooks execute-notebooks ci
 
 test:
 	poetry run pytest --cov=nexa_bidkit --cov-report=term-missing --cov-fail-under=80
@@ -9,4 +9,10 @@ lint:
 typecheck:
 	poetry run mypy src
 
-ci: lint typecheck test
+test-notebooks:
+	poetry run pytest --nbmake examples/
+
+execute-notebooks:
+	poetry run jupyter nbconvert --to notebook --execute --inplace examples/*.ipynb
+
+ci: lint typecheck test test-notebooks

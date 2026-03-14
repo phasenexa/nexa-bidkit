@@ -383,6 +383,34 @@ print(f"Linked block orders: {len(submission.linked_block_orders)}")
 print(f"Exclusive groups:    {len(submission.exclusive_group_orders)}")
 ```
 
+## Examples
+
+The `examples/` directory contains Jupyter notebooks covering real-world European power market
+scenarios. Each notebook is self-contained and can be run locally after installing the library.
+
+| Notebook | Scenario | Key APIs |
+|----------|----------|----------|
+| [`01_simple_hourly_bids.ipynb`](examples/01_simple_hourly_bids.ipynb) | Hallingdal Wind Farm (NO2) — 24h supply bids with 15-min MTUs | `PriceQuantityCurve`, `simple_bid_from_curve` |
+| [`02_block_bids.ipynb`](examples/02_block_bids.ipynb) | Borgholt CCGT (DE-LU) — startup cost recovery, exclusive operating modes | `LinkedBlockBid`, `ExclusiveGroupBid` |
+| [`03_merit_order_curves.ipynb`](examples/03_merit_order_curves.ipynb) | Fjord Energy aggregator — multi-asset portfolio merit order | `merge_curves`, `scale_curve`, `clip_curve` |
+| [`04_order_book_and_validation.ipynb`](examples/04_order_book_and_validation.ipynb) | Solberg trading desk — end-to-end: order book, validation, Nord Pool export | `OrderBook`, `validate_bids`, `order_book_to_nord_pool` |
+
+### Running the examples
+
+```bash
+# Install with dev dependencies (includes jupyter, matplotlib)
+poetry install
+
+# Run a notebook interactively
+poetry run jupyter notebook examples/01_simple_hourly_bids.ipynb
+
+# Execute all notebooks and update outputs in-place
+make execute-notebooks
+
+# Run notebooks as tests (used by CI)
+make test-notebooks
+```
+
 ## Core Concepts
 
 ### Market Time Units (MTU)
