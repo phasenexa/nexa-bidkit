@@ -98,8 +98,12 @@ nexa-bidkit/
   ## Definition of Done
 
   - Update tests to include new/changed work, aim for >80% code coverage, but prioritise good tests
-  - Run tests and ensure they pass
+  - Run tests and ensure they pass using `make ci`
+  - If anything changed that would impact the notebooks, run `make execute-notebooks` to update their output
   - Run the ruff formatter to reformat code
   - Linters (like black or mypy) show no issues
   - Update README and/or docs to document the new behaviour/feature
+  - Check if Makefile is missing any common operations (for new functionality added)
+  - When adding/changing significant work, add a new notebook to @examples/ documenting the feature
+    - If done, execute using `make execute-notebooks` so the output is checked in
   - Add anything needed in @.gitignore to avoid checking in secrets, or temp files/logs
