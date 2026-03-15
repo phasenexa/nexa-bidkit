@@ -1,0 +1,168 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      is_prerelease: ${{ steps.check.outputs.is_prerelease }}
+    steps:
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Validate tag matches pyproject.toml version
+        id: check
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          VERSION="${TAG#v}"
+          TOML_VERSION=$(grep -m1 '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+
+          if [ "$VERSION" != "$TOML_VERSION" ]; then
+            echo "ERROR: tag $VERSION does not match pyproject.toml version $TOML_VERSION"
+            exit 1
+          fi
+
+          IS_PRERELEASE="${{ github.event.release.prerelease }}"
+
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            if ! echo "$VERSION" | grep -qE '[ab]|rc'; then
+              echo "ERROR: Release is flagged as pre-release but version $VERSION does not contain a/b/rc"
+              exit 1
+            fi
+          else
+            if echo "$VERSION" | grep -qE '[ab]|rc'; then
+              echo "ERROR: Release is flagged as stable but version $VERSION contains a pre-release marker"
+              exit 1
+            fi
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "is_prerelease=$IS_PRERELEASE" >> "$GITHUB_OUTPUT"
+          echo "OK: version $VERSION validated (prerelease=$IS_PRERELEASE)"
+
+  ci:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-3.11-${{ hashFiles('**/pyproject.toml') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Install project
+        run: poetry install --no-interaction
+
+      - name: Run ruff linting
+        run: poetry run ruff check src tests
+
+      - name: Run ruff formatting check
+        run: poetry run ruff format --check src tests
+
+      - name: Run mypy type checking
+        run: poetry run mypy src
+
+      - name: Run example notebooks
+        run: make test-notebooks
+
+      - name: Run tests with coverage
+        run: poetry run pytest --cov=src/nexa_bidkit --cov-report=xml --cov-report=term
+
+      - name: Check coverage threshold
+        run: poetry run coverage report --fail-under=80
+
+  build:
+    needs: [validate, ci]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Build distribution
+        run: poetry build
+
+      - name: Upload build artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ needs.validate.outputs.version }}
+          path: dist/
+          if-no-files-found: error
+
+  publish-testpypi:
+    needs: [validate, build]
+    runs-on: ubuntu-latest
+    environment: testpypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download build artefacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ needs.validate.outputs.version }}
+          path: dist/
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  publish-pypi:
+    needs: [validate, publish-testpypi]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download build artefacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ needs.validate.outputs.version }}
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

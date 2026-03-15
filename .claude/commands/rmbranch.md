@@ -1,0 +1,1 @@
+If you're not in the main branch, delete the local git branch you're in and move back to main.

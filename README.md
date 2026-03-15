@@ -466,6 +466,91 @@ poetry run pytest tests/ -v
 poetry run pytest --cov=nexa_bidkit --cov-report=term-missing
 ```
 
+## Releasing a new version
+
+Releases are published to PyPI automatically via GitHub Actions when a GitHub release is created.
+The pipeline validates, runs CI, builds, publishes to TestPyPI, then (after human approval) publishes to PyPI.
+
+### Prerequisites (one-time, per environment)
+
+**PyPI Trusted Publishers** — configure on both `pypi.org` and `test.pypi.org`:
+
+1. Log in → Account Settings → Publishing → "Add a new pending publisher"
+2. Fill in: Owner `phasenexa`, Repo `nexa-bidkit`, Workflow `publish.yml`, Environment `pypi` (or `testpypi`)
+
+**GitHub Environments** — in Repo Settings → Environments:
+
+- Create `testpypi` with no protection rules
+- Create `pypi` with a Required Reviewer (yourself) — this is the human approval gate before PyPI publish
+
+### Publishing a beta release
+
+```bash
+# 1. Bump the version in pyproject.toml
+make bump version=1.0.0b1
+
+# 2. Commit and push
+git add pyproject.toml
+git commit -m "chore: bump version to 1.0.0b1"
+git push
+
+# 3. On GitHub: create a new Release
+#    - Tag: v1.0.0b1
+#    - Check "This is a pre-release"
+#    - Publish release
+```
+
+### Publishing a stable release
+
+```bash
+# 1. Bump the version in pyproject.toml
+make bump version=1.0.0
+
+# 2. Commit and push
+git add pyproject.toml
+git commit -m "chore: bump version to 1.0.0"
+git push
+
+# 3. On GitHub: create a new Release
+#    - Tag: v1.0.0
+#    - Do NOT check "This is a pre-release"
+#    - Publish release
+```
+
+### What happens next
+
+```
+validate → ci → build → publish-testpypi → [approval] → publish-pypi
+```
+
+1. **validate** — confirms the tag matches `pyproject.toml` and the pre-release flag is consistent
+2. **ci** — runs the full test suite (lint, type check, tests, notebooks, coverage ≥80%) against the exact tagged commit
+3. **build** — produces `.whl` and `.tar.gz` via `poetry build`
+4. **publish-testpypi** — publishes automatically to `test.pypi.org`
+5. **publish-pypi** — waits for a human approval in the `pypi` GitHub Environment, then publishes to `pypi.org`
+
+### Verify the release
+
+```bash
+# Check test.pypi.org first (no approval needed)
+pip install --index-url https://test.pypi.org/simple/ nexa-bidkit==1.0.0b1
+
+# After approving the pypi gate, check the stable index
+pip install nexa-bidkit==1.0.0
+
+# Pre-releases require --pre
+pip install --pre nexa-bidkit
+```
+
+### Local pre-flight check
+
+Before creating a GitHub release, verify the tag matches `pyproject.toml`:
+
+```bash
+make publish-check tag=v1.0.0
+# OK: 1.0.0 matches pyproject.toml
+```
+
 ## License
 
 MIT
