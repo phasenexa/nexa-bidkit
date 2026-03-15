@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nexa-bidkit"
-version = "1.0.0b1"
+version = "1.0.0"
 description = "Day-ahead and intraday auction bid generation for European power markets"
 authors = []
 readme = "README.md"
