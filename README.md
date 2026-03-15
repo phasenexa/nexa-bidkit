@@ -503,6 +503,7 @@ gh pr create --title "chore: bump version to 1.0.0b1" --body "Version bump for b
 #    - Tag: v1.0.0b1  (target: main)
 #    - Check "This is a pre-release"
 #    - Publish release
+#    - Delete the chore branchs
 ```
 
 ### Publishing a stable release
@@ -525,6 +526,7 @@ gh pr create --title "chore: bump version to 1.0.0" --body "Version bump for sta
 #    - Tag: v1.0.0  (target: main)
 #    - Do NOT check "This is a pre-release"
 #    - Publish release
+#    - Delete the chore branchs
 ```
 
 ### What happens next
